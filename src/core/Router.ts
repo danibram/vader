@@ -12,6 +12,7 @@ import IMiddleware from  '../core/IMiddleware';
 import VaderContext from  '../core/VaderContext';
 import Response from  '../core/Response';
 import ControllerProperty from '../core/ControllerProperty';
+import * as docs from '../utils/swagger';
 import * as Metadata from '../utils/Metadata';
 
 interface Route {
@@ -232,6 +233,26 @@ class Router {
                 params: route.PARAMS,
             });
         }
+    }
+
+    docs(swagger: docs.IgeneralSwagger | any){
+        swagger = docs.swaggerGen(swagger)
+
+                console.log(this._routes)
+        this._routes.forEach((r: Route) => {
+                let url = docs.turnSwaggerIds(r.path[0])
+                swagger.paths[url] = (swagger.paths[url]) ? swagger.paths[url] : {}
+                swagger.paths[url][r.method] = docs.composePath({
+                    parameters: r.params.map(p => ({
+                            name: (p.paramKey ) ? p.paramKey : '',
+                            in: p.key,
+                            description: 'Underconstruction param',
+                            required: false
+                        }))
+                })
+            })
+
+        return swagger
     }
 }
 
